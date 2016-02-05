@@ -1,0 +1,59 @@
+﻿@using Orchard.ContentManagement;
+@using Orchard.Gallery.Models;
+@{
+    ContentItem contentItem = Model.ContentItem;
+    var packageVersionPart = contentItem.As<PackageVersionPart>();
+    PackagePart packagePart = packageVersionPart.PackagePart;
+    var packageId = packagePart.PackageId;
+
+    var owner = Model.ContentItem.CommonPart.Owner;
+}
+
+<div class="row">
+    <div class="col-sm-8">
+        <h1>
+            @Html.TitleForPage(Html.ItemDisplayText(packagePart)) <span class="package-version">@packageVersionPart.Version</span>
+            @if (AuthorizedFor(Orchard.Core.Contents.Permissions.EditContent, packageVersionPart)) {
+                <a href="@Url.ItemEditUrl(packageVersionPart.ContentItem)" role="button" class="hidden-xs pull-right btn btn-secondary"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> @T("Edit")</a>
+            }
+            <a href="@Url.Action("Download", "PackageVersion", new { id = packageId, version = packageVersionPart.Version, area = "Orchard.Gallery" })" role="button" rel="nofollow" class="hidden-xs pull-right btn btn-default"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> @T("Download")</a>
+            <span class="package-summary">
+                @packagePart.Summary
+            </span>
+        </h1>
+
+        @if (!String.IsNullOrWhiteSpace(packageVersionPart.BodyPart.Text)) {
+            <h3>@T("Changelog")</h3>
+            @Display(Model.Body)
+        }
+        else {
+            <div class="alert alert-warning">@T("This package version doesn't have any changelog information")</div>
+        }
+
+    </div>
+
+    <div class="sidebar col-sm-4">
+        <ul class="box">
+            <li>
+                @if (owner != null) {
+                    @Display.Gravatar(
+                        Email: owner.Email, 
+                        Size: 25, 
+                        Classes: new[] { "gravatar" }
+                    )
+                    <span>@(owner.User.DisplayName.Value ?? owner.UserName)</span>
+                }
+            </li>
+            <li>
+                @T("published {0}", Display.DateTimeRelative(dateTimeUtc: packageVersionPart.CommonPart.CreatedUtc))
+            </li>
+
+        </ul>
+
+        <h4>Stats</h4>
+        @T("{0} downloads", Html.Raw("<strong>" + packageVersionPart.DownloadCount + "</strong>"))
+
+
+    </div>
+</div>
+

@@ -1,2 +1,2 @@
 # TheGalleryMachine
-Default theme of the public galler
+Default theme of the public gallery

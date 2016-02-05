@@ -1,0 +1,101 @@
+﻿@using Orchard.ContentManagement;
+@{
+    Script.Require("jQuery");
+
+    ContentItem contentItem = Model.ContentItem;
+
+    string licenseUrl = Model.ContentItem.PackagePart.LicenseUrl;
+    string license = Model.ContentItem.PackagePart.License;
+    var packageId = Model.ContentItem.PackagePart.PackageId;
+    string packageLatestVersion = Model.ContentItem.PackagePart.LatestVersion;
+
+    var owner = Model.ContentItem.CommonPart.Owner;
+}
+
+<div class="row">
+    <div class="col-sm-8">
+        <h1>
+            @Html.TitleForPage(Html.ItemDisplayText(contentItem)) <span class="package-version">@packageLatestVersion</span>
+            @if (AuthorizedFor(Orchard.Core.Contents.Permissions.EditContent, contentItem)) {
+                <a href="@Url.ItemEditUrl(contentItem)" role="button" class="hidden-xs pull-right btn btn-secondary"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> @T("Edit")</a>
+            }
+            <a href="@Url.Action("Download", "PackageVersion", new { id = packageId, version = packageLatestVersion, area = "Orchard.Gallery" })" role="button" rel="nofollow" class="hidden-xs pull-right btn btn-default"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> @T("Download")</a>
+            <span class="package-summary">
+                @Model.ContentItem.PackagePart.Summary
+            </span>
+        </h1>
+
+        <div class="row">
+            @foreach (var media in ((IEnumerable<dynamic>)((dynamic)Model.ContentItem).Package.Screenshots.MediaParts).Take(1)) {
+                <img id="thumbnail" src="@Display.ResizeMediaUrl(Path: media.MediaUrl, Width: 1024, Heigth: 768)" class="col-sm-12" />
+            }
+        </div>
+
+        <div class="row top-buffer">
+            @foreach (var media in ((dynamic)Model.ContentItem).Package.Screenshots.MediaParts) {
+                <img height="150" class="snippet col-sm-3" src="@Display.ResizeMediaUrl(Path: media.MediaUrl, Width: 1024, Heigth: 768)" />
+            }
+        </div>
+            
+        @Display(Model.Body)
+
+        </div>
+
+    <div class="sidebar col-sm-4">
+        <ul class="box">
+            <li>
+                @if (owner != null) {
+                    @Display.Gravatar(
+                        Email: owner.Email, 
+                        Size: 25, 
+                        Classes: new[] { "gravatar" }
+                    )
+                    <span>@(owner.User.DisplayName.Value ?? owner.UserName)</span>
+                }
+            </li>
+            <li>
+                @T("published {0}", Display.DateTimeRelative(dateTimeUtc: Model.ContentItem.CommonPart.CreatedUtc))
+            </li>
+            <li>
+                @if (!String.IsNullOrWhiteSpace(licenseUrl) &&
+                    !String.IsNullOrWhiteSpace(license)) {
+                    <a href="@licenseUrl">@license</a>
+                }
+                else if (!String.IsNullOrWhiteSpace(licenseUrl)) {
+                    <a href="@licenseUrl">@licenseUrl</a>
+                } else if (!String.IsNullOrWhiteSpace(license)) { 
+                    @T("{0} license", license)
+                }
+                else {
+                    @T("no license information")
+                }
+                </li>
+            <li>
+                <a href="@Model.ContentItem.PackagePart.ProjectUrl">@Model.ContentItem.PackagePart.ProjectUrl</a>
+            </li>
+        </ul>
+
+        <h4>Stats</h4>
+        @T("{0} downloads", Html.Raw("<strong>" + Model.ContentItem.PackagePart.DownloadCount + "</strong>"))
+        
+        @if (HasText(Display(Model.Tags))) {
+            <h4>Tags</h4>
+            @Display(Model.Tags)
+        }
+
+        <h4>Versions</h4>
+        @Display(Model.PackageVersions)
+
+    </div>
+</div>
+
+@using(Script.Foot()) {
+    <script language="javascript">
+        $(function () {
+            $(".snippet").click(function () {
+                var src = $(this).attr("src");
+                $("#thumbnail").attr("src", src);
+            })
+        });
+    </script>
+}

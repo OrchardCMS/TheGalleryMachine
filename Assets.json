@@ -1,0 +1,16 @@
+﻿[
+  {
+    "inputs": [ "Assets/Less/*.less" ],
+    "output": "Styles/@.css",
+    "watch": [ "../TheBootstrapMachine/Assets/Less/*.less" ],
+    "generateSourceMaps":  false
+  },
+  {
+    "inputs": [ "Assets/TypeScript/*.ts" ],
+    "output": "Scripts/@.js"
+  },
+  {
+    "inputs": [ "Assets/JavaScript/Lib/*.js" ],
+    "output": "Scripts/Lib/@.js"
+  }
+]

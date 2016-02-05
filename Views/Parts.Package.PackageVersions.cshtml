@@ -1,0 +1,15 @@
+﻿@using Orchard.Gallery.Models;
+
+@{ 
+    PackagePart package = Model.Package;
+    IList<PackageVersionPart> packageVersions = Model.PackageVersions;
+}
+
+@foreach (var packageVersion in packageVersions) {
+    string version = packageVersion.Version;
+    <div class="row">
+        <div class="col-xs-2 text-right"><a href="@Url.ItemDisplayUrl(packageVersion)">@version</a></div>
+        <div class="col-xs-10"><span>@T("{0} downloads", packageVersion.DownloadCount)</span></div>
+    </div>
+}
+

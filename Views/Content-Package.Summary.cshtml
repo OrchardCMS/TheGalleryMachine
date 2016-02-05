@@ -1,0 +1,48 @@
+﻿@using Orchard.ContentManagement;
+@using Orchard.Security;
+@{
+    var packageId = Model.ContentItem.PackagePart.PackageId;
+    string packageLatestVersion = Model.ContentItem.PackagePart.LatestVersion;
+
+    ContentItem contentItem = Model.ContentItem;
+}
+
+<hr />
+<div class="media">
+    <div class="media-left">
+        <a href="@Url.ItemDisplayUrl(contentItem)">
+            @if (Model.ContentItem.Package.Icon == null || Model.ContentItem.Package.Icon.FirstMediaUrl == null) {
+                <img class="package-logo media-object" alt="64x64"
+                     src="~/Themes/TheGalleryMachine/Content/moduleDefaultIcon.png"
+                     style="width: 64px; height: 64px;">
+            }
+            else {
+                <img class="package-logo media-object" alt="logo"
+                     src="@Display.ResizeMediaUrl(Path: Model.ContentItem.Package.Icon.FirstMediaUrl, Width: 64, Heigth: 64)"
+                     style="width: 64px; height: 64px;">
+            }
+        </a>
+</div>
+    <div class="media-body">
+        <h3 class="media-heading">
+            @Html.ItemDisplayLink(contentItem) 
+            <a href="@Url.Action("Download", "PackageVersion", new { id = packageId, version = packageLatestVersion, area = "Orchard.Gallery" })" role="button" rel-="nofollow" class="hidden-xs pull-right btn btn-default"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> @T("Download")</a>
+        </h3>
+        <h4>
+            @Model.ContentItem.PackagePart.Summary  
+        </h4>
+
+        <p class="package-by">
+            @{
+                dynamic owner = Model.ContentItem.CommonPart.Owner;
+            }
+
+            @if(owner != null && !String.IsNullOrEmpty(Model.ContentItem.PackagePart.LatestVersion)) {
+                var link = Html.ActionLink((string)Model.ContentItem.PackagePart.LatestVersion, "Display", "PackageVersion", new { id = Model.ContentItem.PackagePart.PackageId, version = Model.ContentItem.PackagePart.LatestVersion }, null);
+                @T("{0} published {1} by {2}", link, Display.DateTimeRelative(dateTimeUtc: Model.ContentItem.CommonPart.CreatedUtc), owner.ContentItem.User.DisplayName.Value ?? owner.UserName)
+            }
+        </p>
+        
+    </div>
+</div>
+
